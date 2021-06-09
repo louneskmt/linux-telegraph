@@ -1,0 +1,29 @@
+version: '3.7'
+
+services:
+    mongo:
+        image: mongo
+        restart: always
+        expose: 
+            - 27017
+        environment:
+            MONGO_INITDB_DATABASE: bitcoin-dev
+
+    bitcoin-dev:
+        build: ./backend
+        user: "1000:1000"
+        command: "./wait-for-it.sh mongo:27017 --timeout=720 --strict -- node app.js"
+        volumes: 
+            - $PWD/data:/data
+        environment: 
+            DATADIR: /data
+            MONGODB_IP: mongo
+            MONGODB_PORT: 27017
+
+            MAIL_ADDRESS: "bitcoin-dev@louneskmt.com"
+            MAIL_HOST: mail.louneskmt.com
+            MAIL_PORT: 993
+            MAIL_TLS: "true"
+        depends_on:
+            - mongo
+    
